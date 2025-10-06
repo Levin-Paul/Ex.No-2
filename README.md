@@ -1,10 +1,10 @@
-# Ex.No :2
-# GENERATION OF LEXICAL TOKENS USING LEX/FLEX TOOL
-## Register Number:212224040170
-## Date:09/09/2025
-## AIM
- To write a lex program to implement lexical analyzer to recognize a few patterns.
-## ALGORITHM
+# Ex-2-GENERATION OF LEXICAL TOKENS LEX FLEX TOOL
+# Name : Levin Paul David 
+# Register Number: 212224040170
+# DATE: 09/09/2025
+# AIM
+## To write a lex program to implement lexical analyzer to recognize a few patterns.
+# ALGORITHM
 
 1.	Start the program.
 
@@ -34,86 +34,68 @@
 6.	Compile the lex program with lex compiler to produce output file as lex.yy.c. eg $ lex filename.l $ cc lex.yy.c
 7.	Compile that file with C compiler and verify the output.
 
-## PROGRAM:
+# INPUT: 
+### ex2.l
 ```
+%{
 #include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+#include <stdlib.h>
 
-int isKeyword(char buffer[]) {
-    char keywords[8][10] = {"if", "else", "while", "for", "int", "return", "char", "float"};
-    for (int i = 0; i < 8; ++i) {
-        if (strcmp(buffer, keywords[i]) == 0) {
-            return 1;
+int COMMENT = 0;
+%}
+
+identifier [a-zA-Z_][a-zA-Z0-9_]*
+
+%%
+#.*                       { printf("\n%s is a PREPROCESSOR DIRECTIVE", yytext); }
+int|float|char|double|while|for|do|if|break|continue|void|switch|case|long|struct|const|typedef|return|else|goto { 
+                           printf("\n\t%s is a KEYWORD", yytext); 
+}
+"/*"                     { COMMENT = 1; }
+"*/"                     { COMMENT = 0; }
+{identifier}\(           { if (!COMMENT) printf("\n\nFUNCTION\n\t%s", yytext); }
+\{                       { if (!COMMENT) printf("\n BLOCK BEGINS"); }
+\}                       { if (!COMMENT) printf("\n BLOCK ENDS"); }
+{identifier}(\[[0-9]*\])? { if (!COMMENT) printf("\n\t%s IDENTIFIER", yytext); }
+\"[^\"\\]*(\\.[^\"\\]*)*\" { if (!COMMENT) printf("\n\t%s is a STRING", yytext); }
+[0-9]+                   { if (!COMMENT) printf("\n\t%s is a NUMBER", yytext); }
+=                        { if (!COMMENT) printf("\n\t%s is an ASSIGNMENT OPERATOR", yytext); }
+\<=|\>=|\<|==|\>        { if (!COMMENT) printf("\n\t%s is a RELATIONAL OPERATOR", yytext); }
+[\+\-\*/]               { if (!COMMENT) printf("\n\t%s is an ARITHMETIC OPERATOR", yytext); }
+[^\n]+                  { if (!COMMENT) printf("\n\tUNKNOWN CHARACTER: %s", yytext); } // Catch-all for unrecognized characters
+\n                      { /* Ignore newline */ }
+%%
+
+int main(int argc, char **argv) { 
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r"); 
+        if (!file) {
+            printf("Could not open %s \n", argv[1]); 
+            exit(1);
         }
+        yyin = file;
     }
+    yylex(); 
+    printf("\n\n"); 
     return 0;
 }
 
-int main() {
-    char ch;
-    char operators[] = "+-*/=;<>(){}";
-    char buffer[30];
-    int i = 0;
+int yywrap() { return 1; }
 
-    printf("Enter your input (Ctrl+D to stop):\n");
-
-    while ((ch = getchar()) != EOF) {
-        if (strchr(operators, ch) != NULL) {
-            if (i > 0) {
-                buffer[i] = '\0';
-                if (isKeyword(buffer)) {
-                    printf("Keyword: %s\n", buffer);
-                } else if (isalpha(buffer[0])) {
-                    printf("Identifier: %s\n", buffer);
-                } else if (isdigit(buffer[0])) {
-                    printf("Number: %s\n", buffer);
-                }
-                i = 0;
-            }
-            printf("Operator: %c\n", ch);
-        } 
-        else if (isalnum(ch)) {
-            if (i < sizeof(buffer) - 1) {
-                buffer[i++] = ch;
-            }
-        } 
-        else if ((ch == ' ' || ch == '\n' || ch == '\t') && i > 0) {
-            buffer[i] = '\0';
-            if (isKeyword(buffer)) {
-                printf("Keyword: %s\n", buffer);
-            } else if (isalpha(buffer[0])) {
-                printf("Identifier: %s\n", buffer);
-            } else if (isdigit(buffer[0])) {
-                printf("Number: %s\n", buffer);
-            }
-            i = 0;
-        }
-    }
-
-    if (i > 0) {
-        buffer[i] = '\0';
-        if (isKeyword(buffer)) {
-            printf("Keyword: %s\n", buffer);
-        } else if (isalpha(buffer[0])) {
-            printf("Identifier: %s\n", buffer);
-        } else if (isdigit(buffer[0])) {
-            printf("Number: %s\n", buffer);
-        }
-    }
-
+```
+### var.c
+```
+#include<stdio.h>
+int main()
+{
+    int a,b;
     return 0;
 }
 ```
-## INPUT:
+# OUTPUT:
+<img width="786" height="269" alt="image" src="https://github.com/user-attachments/assets/c96073fe-84f9-47d7-8453-1dab6560d947" />
 
-```
-int a = b*c+d*a
-```
 
-## OUTPUT:
 
-<img width="356" height="272" alt="image" src="https://github.com/user-attachments/assets/e32bda51-5665-4cd1-8cb2-c02ecab4ccba" />
-
-## RESULT:
- The lexical analyzer is implemented using lex and the output is verified.
+# RESULT
+## The lexical analyzer is implemented using lex and the output is verified.
